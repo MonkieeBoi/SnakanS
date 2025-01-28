@@ -1,7 +1,6 @@
 package main
 
 import (
-    "fmt"
     "log"
 
     "github.com/gdamore/tcell/v2"
@@ -25,7 +24,10 @@ func drawText(s tcell.Screen, x1, y1, x2, y2 int, style tcell.Style, text string
 }
 
 func main() {
-    defStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
+    def_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
+    head_style := tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorReset)
+    tail_style := tcell.StyleDefault.Background(tcell.ColorGreen).Foreground(tcell.ColorReset)
+    box_style := tcell.StyleDefault.Background(tcell.ColorWhite).Foreground(tcell.ColorReset)
 
     // Initialize screen
     s, err := tcell.NewScreen()
@@ -35,7 +37,7 @@ func main() {
     if err := s.Init(); err != nil {
         log.Fatalf("%+v", err)
     }
-    s.SetStyle(defStyle)
+    s.SetStyle(def_style)
     s.Clear()
 
     quit := func() {
@@ -52,16 +54,23 @@ func main() {
     quitq := make(chan struct{})
     go s.ChannelEvents(eventq, quitq)
 
-    x := 0
+    border := newWin(s, 0, 0, 50, 23)
+    game_win := newWin(s, 2, 1, 46, 21)
+    matrix := make([][]BodyType, 23)
+    for i := range matrix {
+        matrix[i] = make([]BodyType, 21)
+    }
+    snake := newSnake(1, 11, 4)
+    matrixInit(matrix, snake)
+
     for {
-        // Update screen
-        drawText(s, 0, 0, 20, 20, tcell.StyleDefault, fmt.Sprintf("%d", x))
-        x++
+        drawBorder(border, box_style)
+        drawMatrix(game_win, matrix, head_style, tail_style)
+        // drawStat()
         s.Show()
 
         select {
-        case ev := <- eventq:
-            // Process event
+        case ev := <-eventq:
             switch ev := ev.(type) {
             case *tcell.EventResize:
                 s.Sync()
