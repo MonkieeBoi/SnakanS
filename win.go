@@ -20,21 +20,19 @@ func newWin(s tcell.Screen, x int, y int, w int, h int) *Win {
 func drawBorder(w *Win, style tcell.Style) {
     // Top
     for i := 0; i < w.w; i++ {
-        w.s.SetContent(w.x+i, w.y, ' ', nil, style)
+        w.s.SetContent(w.x+i, w.y, '▄', nil, style)
     }
     // Bot
     for i := 0; i < w.w; i++ {
-        w.s.SetContent(w.x+i, w.y+w.h, ' ', nil, style)
+        w.s.SetContent(w.x+i, w.y+w.h, '▀', nil, style)
     }
     // Left
-    for j := 0; j < w.h; j++ {
-        w.s.SetContent(w.x, w.y+j, ' ', nil, style)
-        w.s.SetContent(w.x+1, w.y+j, ' ', nil, style)
+    for j := 1; j < w.h; j++ {
+        w.s.SetContent(w.x, w.y+j, '█', nil, style)
     }
     // Right
-    for j := 0; j < w.h; j++ {
-        w.s.SetContent(w.x+w.w-1, w.y+j, ' ', nil, style)
-        w.s.SetContent(w.x+w.w-2, w.y+j, ' ', nil, style)
+    for j := 1; j < w.h; j++ {
+        w.s.SetContent(w.x+w.w-1, w.y+j, '█', nil, style)
     }
 }
 

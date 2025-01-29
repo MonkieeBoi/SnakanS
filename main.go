@@ -27,7 +27,7 @@ func main() {
     def_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
     head_style := tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorReset)
     tail_style := tcell.StyleDefault.Background(tcell.ColorGreen).Foreground(tcell.ColorReset)
-    box_style := tcell.StyleDefault.Background(tcell.ColorWhite).Foreground(tcell.ColorReset)
+    box_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorWhite)
 
     // Initialize screen
     s, err := tcell.NewScreen()
@@ -49,23 +49,21 @@ func main() {
     }
     defer quit()
 
+    width := 23
+    height := 21
+    border := newWin(s, 0, 0, width * 2 + 2, height + 2)
+    game_win := newWin(s, border.x + 1, border.y + 1, width * 2, height)
+    game := newGame(width, height)
+
     // Event loop
     eventq := make(chan tcell.Event)
     quitq := make(chan struct{})
     go s.ChannelEvents(eventq, quitq)
 
-    border := newWin(s, 0, 0, 50, 23)
-    game_win := newWin(s, 2, 1, 46, 21)
-    matrix := make([][]BodyType, 23)
-    for i := range matrix {
-        matrix[i] = make([]BodyType, 21)
-    }
-    snake := newSnake(1, 11, 4)
-    matrixInit(matrix, snake)
-
-    for {
+    for !game.dead {
+        gameTick(game)
         drawBorder(border, box_style)
-        drawMatrix(game_win, matrix, head_style, tail_style)
+        drawMatrix(game_win, game.matrix, head_style, tail_style)
         // drawStat()
         s.Show()
 
@@ -75,7 +73,7 @@ func main() {
             case *tcell.EventResize:
                 s.Sync()
             case *tcell.EventKey:
-                if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
+                if ev.Rune() == 'q' || ev.Key() == tcell.KeyCtrlC {
                     return
                 } else if ev.Key() == tcell.KeyCtrlL {
                     s.Sync()
@@ -84,6 +82,6 @@ func main() {
         default:
         }
         s.Clear()
-        time.Sleep(time.Millisecond * 16)
+        time.Sleep(time.Millisecond * 200)
     }
 }
