@@ -61,7 +61,7 @@ func main() {
     go s.ChannelEvents(eventq, quitq)
 
     for !game.dead {
-        gameTick(game)
+        s.Clear()
         drawBorder(border, box_style)
         drawMatrix(game_win, game.matrix, head_style, tail_style)
         // drawStat()
@@ -77,11 +77,21 @@ func main() {
                     return
                 } else if ev.Key() == tcell.KeyCtrlL {
                     s.Sync()
+                } else if ev.Rune() == 'w' {
+                    turnSnake(game.snake, UP)
+                } else if ev.Rune() == 'a' {
+                    turnSnake(game.snake, LEFT)
+                } else if ev.Rune() == 's' {
+                    turnSnake(game.snake, DOWN)
+                } else if ev.Rune() == 'd' {
+                    turnSnake(game.snake, RIGHT)
+                } else if ev.Rune() == ' ' {
+                    flipSnake(game.snake)
                 }
             }
         default:
         }
-        s.Clear()
-        time.Sleep(time.Millisecond * 200)
+        gameTick(game)
+        time.Sleep(time.Millisecond * 20)
     }
 }

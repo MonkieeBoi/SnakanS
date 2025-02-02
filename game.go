@@ -4,10 +4,11 @@ type Game struct {
     snake  *Snake
     matrix [][]BodyType
     dead   bool
+    tickc  int
 }
 
 func newGame(mw int, mh int) *Game {
-    snake := newSnake(1, mh / 2 + mh & 1, 4)
+    snake := newSnake(1, mh / 2 + mh & 1, 4, 10)
     matrix := make([][]BodyType, mw)
     for i := range matrix {
         matrix[i] = make([]BodyType, mh)
@@ -16,7 +17,40 @@ func newGame(mw int, mh int) *Game {
     return &Game{snake: snake, matrix: matrix}
 }
 
+func validMove(game *Game) bool {
+    s := game.snake
+    var x int
+    var y int
+    var endx int
+    var endy int
+
+    if s.end == Head {
+        x = s.head.x + s.move.dx
+        y = s.head.y + s.move.dy
+        endx = s.tail.x
+        endy = s.tail.y
+    } else {
+        x = s.tail.x + s.move.dx
+        y = s.tail.y + s.move.dy
+        endx = s.head.x
+        endy = s.head.y
+    }
+
+    if x < 0 ||
+        y < 0 ||
+        x >= len(game.matrix) ||
+        y >= len(game.matrix[0]) ||
+        (!(endx == x && endy == y) && game.matrix[x][y] != None) {
+
+        return false
+    }
+    return true
+}
+
 func moveSnake(game *Game) bool {
+    if !validMove(game) {
+        return false
+    }
     s := game.snake
     if s.end == Head {
         game.matrix[s.tail.x][s.tail.y] = None
@@ -26,9 +60,6 @@ func moveSnake(game *Game) bool {
 
         s.head.prev = &Node{x: s.head.x + s.move.dx, y: s.head.y + s.move.dy, typ: Head, next: s.head}
         s.head = s.head.prev
-        if s.head.x < 0 || s.head.y < 0 || s.head.x >= len(game.matrix) || s.head.y >= len(game.matrix[0]) {
-            return false
-        }
         game.matrix[s.head.x][s.head.y] = Head
 
         s.mid = s.mid.prev
@@ -42,30 +73,19 @@ func moveSnake(game *Game) bool {
 
         s.tail.next = &Node{x: s.tail.x + s.move.dx, y: s.tail.y + s.move.dy, typ: Tail, prev: s.tail}
         s.tail = s.tail.next
-        if s.tail.x < 0 || s.tail.y < 0 || s.tail.x >= len(game.matrix) || s.tail.y >= len(game.matrix[0]) {
-            return false
-        }
         game.matrix[s.tail.x][s.tail.y] = Tail
 
         game.matrix[s.mid.x][s.mid.y] = Head
         s.mid.typ = Head
         s.mid = s.mid.next
-
     }
     return true
 }
 
 func gameTick(game *Game) {
-    // bouncing for now
-    s := game.snake
-    if s.head.x == len(game.matrix) - 1 {
-        s.move.dx = -1
-        s.end = Tail
-    } else if s.tail.x == 0  {
-        s.move.dx = 1
-        s.end = Head
-    }
-    if !moveSnake(game) {
-        game.dead = true
+    game.tickc++
+    if game.tickc == game.snake.ms {
+        game.tickc = 0
+        game.dead = !moveSnake(game)
     }
 }
