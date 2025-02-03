@@ -1,20 +1,25 @@
 package main
 
+import "math/rand"
+
 type Game struct {
     snake  *Snake
-    matrix [][]BodyType
+    matrix [][]FieldType
     dead   bool
     tickc  int
+    fruits int
 }
 
 func newGame(mw int, mh int) *Game {
     snake := newSnake(1, mh / 2 + mh & 1, 4, 10)
-    matrix := make([][]BodyType, mw)
+    matrix := make([][]FieldType, mw)
     for i := range matrix {
-        matrix[i] = make([]BodyType, mh)
+        matrix[i] = make([]FieldType, mh)
     }
     matrixInit(matrix, snake)
-    return &Game{snake: snake, matrix: matrix}
+    game := &Game{snake: snake, matrix: matrix}
+    genFruit(game)
+    return game
 }
 
 func validMove(game *Game) bool {
@@ -40,7 +45,8 @@ func validMove(game *Game) bool {
         y < 0 ||
         x >= len(game.matrix) ||
         y >= len(game.matrix[0]) ||
-        (!(endx == x && endy == y) && game.matrix[x][y] != None) {
+            (!(endx == x && endy == y) &&
+            (game.matrix[x][y] == Tail || game.matrix[x][y] == Head)) {
 
         return false
     }
@@ -53,33 +59,59 @@ func moveSnake(game *Game) bool {
     }
     s := game.snake
     if s.end == Head {
-        game.matrix[s.tail.x][s.tail.y] = None
-
-        s.tail = s.tail.prev
-        s.tail.next = nil
-
         s.head.prev = &Node{x: s.head.x + s.move.dx, y: s.head.y + s.move.dy, typ: Head, next: s.head}
         s.head = s.head.prev
+
+        if game.matrix[s.head.x][s.head.y] == None {
+            game.matrix[s.tail.x][s.tail.y] = None
+            s.tail = s.tail.prev
+            s.tail.next = nil
+
+            s.mid = s.mid.prev
+            s.mid.typ = Tail
+            game.matrix[s.mid.x][s.mid.y] = Tail
+        } else {
+            game.snake.length++
+            game.fruits--
+        }
+
         game.matrix[s.head.x][s.head.y] = Head
-
-        s.mid = s.mid.prev
-        s.mid.typ = Tail
-        game.matrix[s.mid.x][s.mid.y] = Tail
     } else {
-        game.matrix[s.head.x][s.head.y] = None
-
-        s.head = s.head.next
-        s.head.prev = nil
-
         s.tail.next = &Node{x: s.tail.x + s.move.dx, y: s.tail.y + s.move.dy, typ: Tail, prev: s.tail}
         s.tail = s.tail.next
-        game.matrix[s.tail.x][s.tail.y] = Tail
 
-        game.matrix[s.mid.x][s.mid.y] = Head
-        s.mid.typ = Head
-        s.mid = s.mid.next
+        if game.matrix[s.tail.x][s.tail.y] == None {
+            game.matrix[s.head.x][s.head.y] = None
+            s.head = s.head.next
+            s.head.prev = nil
+
+            game.matrix[s.mid.x][s.mid.y] = Head
+            s.mid.typ = Head
+            s.mid = s.mid.next
+        } else {
+            game.snake.length++
+            game.fruits--
+        }
+
+        game.matrix[s.tail.x][s.tail.y] = Tail
     }
     return true
+}
+
+func genFruit(game *Game) {
+    if game.fruits > 0 {
+        return
+    }
+    w, h := len(game.matrix), len(game.matrix[0])
+    x, y := rand.Intn(w), rand.Intn(h)
+    for game.matrix[x][y] != None {
+        x, y = rand.Intn(w), rand.Intn(h)
+    }
+    game.matrix[x][y] = Apple
+    if rand.Intn(2) == 1 {
+        game.matrix[x][y] = Banana
+    }
+    game.fruits++
 }
 
 func gameTick(game *Game) {
@@ -87,5 +119,6 @@ func gameTick(game *Game) {
     if game.tickc == game.snake.ms {
         game.tickc = 0
         game.dead = !moveSnake(game)
+        genFruit(game)
     }
 }

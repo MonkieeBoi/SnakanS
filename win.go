@@ -43,7 +43,14 @@ func drawCell(w *Win, x int, y int, c rune, style tcell.Style) {
     w.s.SetContent(w.x + x, w.y + y, c, nil, style)
 }
 
-func drawMatrix(w *Win, matrix [][]BodyType, h_style tcell.Style, t_style tcell.Style) {
+func drawMatrix(
+    w       *Win,
+    matrix  [][]FieldType,
+    h_style tcell.Style,
+    t_style tcell.Style,
+    a_style tcell.Style,
+    b_style tcell.Style) {
+
     for i, col := range matrix {
         if i >= w.w {
             break
@@ -59,6 +66,12 @@ func drawMatrix(w *Win, matrix [][]BodyType, h_style tcell.Style, t_style tcell.
             case Tail:
                 drawCell(w, i * 2, j, ' ', t_style)
                 drawCell(w, i * 2 + 1, j, ' ', t_style)
+            case Apple:
+                drawCell(w, i * 2, j, ' ', a_style)
+                drawCell(w, i * 2 + 1, j, ' ', a_style)
+            case Banana:
+                drawCell(w, i * 2, j, ' ', b_style)
+                drawCell(w, i * 2 + 1, j, ' ', b_style)
             }
         }
     }

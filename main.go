@@ -28,6 +28,8 @@ func main() {
     head_style := tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorReset)
     tail_style := tcell.StyleDefault.Background(tcell.ColorGreen).Foreground(tcell.ColorReset)
     box_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorWhite)
+    apple_style := tcell.StyleDefault.Background(tcell.ColorYellow).Foreground(tcell.ColorReset)
+    banana_style := tcell.StyleDefault.Background(tcell.ColorRed).Foreground(tcell.ColorReset)
 
     // Initialize screen
     s, err := tcell.NewScreen()
@@ -63,7 +65,7 @@ func main() {
     for !game.dead {
         s.Clear()
         drawBorder(border, box_style)
-        drawMatrix(game_win, game.matrix, head_style, tail_style)
+        drawMatrix(game_win, game.matrix, head_style, tail_style, apple_style, banana_style)
         // drawStat()
         s.Show()
 

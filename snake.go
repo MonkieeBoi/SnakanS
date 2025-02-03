@@ -1,11 +1,13 @@
 package main
 
-type BodyType int
+type FieldType int
 
 const (
     None = iota
     Head
     Tail
+    Apple
+    Banana
 )
 
 type Movement struct {
@@ -14,7 +16,7 @@ type Movement struct {
 }
 
 type Node struct {
-    typ  BodyType
+    typ  FieldType
     x    int
     y    int
     next *Node
@@ -71,7 +73,7 @@ func flipSnake(snake *Snake) {
     snake.move = &Movement{dx: cur.x - last.x, dy: cur.y - last.y}
 }
 
-func matrixInit(matrix [][]BodyType, snake *Snake) {
+func matrixInit(matrix [][]FieldType, snake *Snake) {
     cur := snake.head
     for cur != nil {
         if cur.x >= len(matrix) || cur.y >= len(matrix[0]) {
