@@ -29,28 +29,29 @@ func validMove(game *Game) bool {
     var endx int
     var endy int
 
+    poisoned := false
+
     if s.end == Head {
         x = s.head.x + s.move.dx
         y = s.head.y + s.move.dy
         endx = s.tail.x
         endy = s.tail.y
+        poisoned = game.matrix[x][y] == Banana
     } else {
         x = s.tail.x + s.move.dx
         y = s.tail.y + s.move.dy
         endx = s.head.x
         endy = s.head.y
+        poisoned = game.matrix[x][y] == Apple
     }
 
-    if x < 0 ||
-        y < 0 ||
-        x >= len(game.matrix) ||
-        y >= len(game.matrix[0]) ||
-            (!(endx == x && endy == y) &&
-            (game.matrix[x][y] == Tail || game.matrix[x][y] == Head)) {
+    outBound := x < 0 || y < 0 ||
+                x >= len(game.matrix) ||
+                y >= len(game.matrix[0])
+    intersects := !(endx == x && endy == y) &&
+            (game.matrix[x][y] == Tail || game.matrix[x][y] == Head)
 
-        return false
-    }
-    return true
+    return !(outBound || intersects || poisoned)
 }
 
 func moveSnake(game *Game) bool {

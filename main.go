@@ -28,8 +28,8 @@ func main() {
     head_style := tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorReset)
     tail_style := tcell.StyleDefault.Background(tcell.ColorGreen).Foreground(tcell.ColorReset)
     box_style := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorWhite)
-    apple_style := tcell.StyleDefault.Background(tcell.ColorYellow).Foreground(tcell.ColorReset)
-    banana_style := tcell.StyleDefault.Background(tcell.ColorRed).Foreground(tcell.ColorReset)
+    apple_style := tcell.StyleDefault.Background(tcell.ColorRed).Foreground(tcell.ColorReset)
+    banana_style := tcell.StyleDefault.Background(tcell.ColorYellow).Foreground(tcell.ColorReset)
 
     // Initialize screen
     s, err := tcell.NewScreen()
