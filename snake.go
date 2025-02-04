@@ -56,8 +56,13 @@ func newSnake(x int, y int, l int, ms int) *Snake {
 }
 
 func turnSnake(snake *Snake, move *Movement) {
-    invalid := &Movement{dx: -snake.move.dx, dy: -snake.move.dy}
-    if *move != *invalid {
+    end := snake.head
+    next := snake.head.next
+    if snake.end == Tail {
+        end = snake.tail
+        next = snake.tail.prev
+    }
+    if move.dx != next.x - end.x || move.dy != next.y - end.y {
         snake.move = move
     }
 }
