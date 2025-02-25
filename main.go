@@ -53,7 +53,7 @@ func main() {
 
     width := 23
     height := 21
-    border := newWin(s, 0, 0, width * 2 + 2, height + 2)
+    border := newWin(s, 0, 0, width * 2 + 2, height + 1)
     game_win := newWin(s, border.x + 1, border.y + 1, width * 2, height)
     game := newGame(width, height)
 
